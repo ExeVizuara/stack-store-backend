@@ -1,14 +1,19 @@
 const express = require("express");
-const path = require('path');
 const app = express();
 const cors = require("cors");
 const config = require("./config.js");
 const db = require("./db.js");
 const uploadFile = require("./S3.js");
-const router = express.Router();
+const fs = require("node:fs");
+const https = require("https");
 
 app.use(cors());
 app.use(express.json());
+
+const server = https.createServer(({
+    cert: fs.readFileSync('cert.pem'),
+    key: fs.readFileSync('cert.key')
+}), app);
 
 app.get("/", async (req,res) => {
     res.send('Conectado al servidor')
@@ -56,6 +61,6 @@ app.post("/saveticket", async (req, res) => {
 
 });
 
-app.listen(config.PORT, () => {
+server.listen(config.PORT, () => {
     console.log("corriendo en puerto", config.PORT);
 })
